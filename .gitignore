@@ -1,0 +1,17 @@
+# Dependencias y configuraciones de Node.js (Backend)
+node_modules/
+npm-debug.log
+.env
+
+# Archivos de compilación de Flutter y Dart (Frontend)
+.dart_tool/
+build/
+.pub-cache/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Archivos del sistema operativo y Visual Studio Code
+.DS_Store
+.vscode/
+Thumbs.db
