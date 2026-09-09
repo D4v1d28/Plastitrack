@@ -79,8 +79,6 @@ Una vez instalado la extensión ThunderClient en VSCode aparecerá un rayo en la
 
 Con el servidor corriendo hacer click en new request y agregar la dirección en GET "http://localhost:3000/api/health"
 
-
-
 al enviarlo devolverá un mensaje 
 
 {
@@ -98,6 +96,21 @@ al enviarlo devolverá un mensaje
 }
 
 
+\---Orden final del Directorio del Backend: ---
+plastitrack-backend/
+├── src/
+│   ├── config/
+│   │   └── db.js
+│   ├── controllers/
+│   │   └── authController.js
+│   ├── middlewares/
+│   │   └── authMiddleware.js
+│   ├── routes/
+│   │   └── authRoutes.js
+│   └── index.js
+├── .env 
+├── package.json
+└── package-lock.json
 
 
 
