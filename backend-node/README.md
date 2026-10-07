@@ -95,26 +95,71 @@ al enviarlo devolverá un mensaje
 
 }
 
+\--- Levantar el servidor Frontend: ---
+
+
+Una vez descomprimida la carpeta del frontend 
+En VSCode File -> Open folder -> Seleccionar plastitrack-frontend
+
+Abrir una terminal nueva y escribir el comando:
+"flutter pub add image_picker"
+"flutter pub get"
+
+Una vez instaladas las dependencias del Flutter:
+"flutter run -d web-server --web-port 8080"
+abrira el simulador en el puerto 8080
+acceder a el desde cualquier navegador ingresando la Url: http://localhost:8080
+Para poder visualizar el frontend primero se debe levantar el servidor del backend.
+
+
+\--- Base de datos: ---
+para poder visualizar los cambios en la base de datos nueva se tendra que abrir MySQL Workbench
+En la pantalla inicial en la parte de MySQL Connections deberá aparecer una conexión predeterminada al haber instalado MySQL server como servicio de Windows con la dirección y puerto por defecto.
+Si no es el caso, crear una conexión con los datos por defecto.
+
+Entrar a la conexión con la contraseña establecida al instalar MySQL server y Workbench
+una vez dentro hacer clic en 
+File -> Open SQL script -> Seleccionar plastitrack_db (la nueva BDD "Temporal")
+y dar clic en el icono del rayo.
+
+Para ver que se haya creado
+Dar clic derecho en Schemas (lateral izquierdo) -> Refresh all
+y aparecera la BDD 
+
+Se puede cambiar el código de la BDD agregando nuevos usuarios personalizados en la parte final del código si gustan q:
+
+ya para ver si cambian las entradas de merma en la bdd hacer una peticion en una New Query Tab de la tabla merma una vez realizado entradas en el front
+
+
 
 \---Orden final del Directorio del Backend: ---
 plastitrack-backend/
-├── src/
+├── src
 │   ├── config/
 │   │   └── db.js
 │   ├── controllers/
-│   │   └── authController.js
+│   │   ├── authController.js
+│   │   ├── paroController.js
+│   │   ├── mermaController.js
+│   │   ├── produccionController.js
+│   │   └── reporteController.js
 │   ├── middlewares/
 │   │   └── authMiddleware.js
 │   ├── routes/
-│   │   └── authRoutes.js
+│   │   ├── paroRoutes.js
+│   │   ├── authRoutes.js
+│   │   ├── mermaRoutes.js
+│   │   ├── produccionRoutes.js
+│   │   └── reporteRoutes.js
+│   ├── uploads/  
+│   │   └── merma-1790236765754-888205563.png
 │   └── index.js
-├── .env 
-├── package.json
-└── package-lock.json
+├── .env          
+└── package.json
+└── plastitrack_db.sql
 
 
 
-\*Nota: solo es funcionamiento del servidor backend como tal con funciones de login y perfil, aún no hay nada visual solo código de autenticación de usuarios q:
 
 
 
