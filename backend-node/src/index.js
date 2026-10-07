@@ -1,19 +1,35 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const mermaRoutes = require('./routes/mermaRoutes');
+const paroRoutes = require('./routes/paroRoutes');
+const produccionRoutes = require('./routes/produccionRoutes');
+const reporteRoutes = require('./routes/reporteRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares globales
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Registro de Rutas
 app.use('/api/auth', authRoutes);
+app.use('/api/mermas', mermaRoutes);
+app.use('/api/paros', paroRoutes);
+app.use('/api/produccion', produccionRoutes);
+app.use('/api/reportes', reporteRoutes);
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ruta de Salud de la API
 app.get('/api/health', async (req, res) => {
@@ -25,6 +41,6 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor Plastitrack corriendo en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor Plastitrack corriendo en ${PORT}`);
 });
