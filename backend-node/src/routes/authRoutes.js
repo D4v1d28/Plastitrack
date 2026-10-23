@@ -14,9 +14,11 @@ router.get('/perfil', verificarToken, (req, res) => {
   });
 });
 
-// Ruta protegida exclusiva para el rol Supervisor
-//Previo a entrega de acts 27 y 28 -- router.get('/panel-supervisor', verificarToken, verificarRol(['Supervisor']), (req, res) => {
-  router.get('/panel-supervisor', verificarToken, verificarRol(['supervisor', 'Supervisor', 'administrador', 'Administrador']), (req, res) => {
+// Ruta para cambiar contraseña propia
+router.put('/cambiar-contrasena', verificarToken, cambiarContrasena);
+
+// Ruta protegida exclusiva para supervisores y administradores
+router.get('/panel-supervisor', verificarToken, verificarRol(['supervisor', 'Supervisor', 'administrador', 'Administrador']), (req, res) => {
   res.json({
     mensaje: 'Bienvenido al panel exclusivo para Supervisores de planta.',
   });
