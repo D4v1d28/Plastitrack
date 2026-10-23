@@ -9,6 +9,7 @@ const mermaRoutes = require('./routes/mermaRoutes');
 const paroRoutes = require('./routes/paroRoutes');
 const produccionRoutes = require('./routes/produccionRoutes');
 const reporteRoutes = require('./routes/reporteRoutes');
+const usuarioRoutes = require('./routes/usuarioRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,7 @@ app.use('/api/mermas', mermaRoutes);
 app.use('/api/paros', paroRoutes);
 app.use('/api/produccion', produccionRoutes);
 app.use('/api/reportes', reporteRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
