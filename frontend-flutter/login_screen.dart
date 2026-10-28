@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/auth_service.dart';
-import 'dashboard_screen.dart';
+import '../services/auth_service.dart'; 
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,172 +10,233 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _userController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService();
-
   bool _obscurePassword = true;
   bool _rememberUser = true;
   bool _isLoading = false;
-  bool _isSuccess = false;
 
-  void _handleAuthSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-      bool success = await _authService.login(
-        _userController.text,
-        _passwordController.text,
+  // Petición Real al Backend
+  Future<void> _handleAuthSubmit() async {
+    final usuario = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (usuario.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Por favor ingresa usuario y contraseña.',
+            style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
       );
-
-      await Future.delayed(const Duration(milliseconds: 1100));
-
-      if (success) {
-        setState(() {
-          _isLoading = false;
-          _isSuccess = true;
-        });
-
-        await Future.delayed(const Duration(milliseconds: 600));
-
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
-        );
-      }
+      return;
     }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Delegamos la autenticación al AuthService que ya tiene los nombres exactos
+    final result = await AuthService.login(usuario, password);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result['success'] == true) {
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result['message'] ?? 'Credenciales incorrectas.',
+            style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
+
+  void _olvideContrasena() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Solicita restablecimiento con tu supervisor de turno.',
+          style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF1E3A5F),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    const primaryContainer = Color(0xFF1E3A5F);
+    const canvasBackground = Color(0xFFEAF2FB);
+    const borderSubtle = Color(0xFFE2E5EA);
+    const textPrimary = Color(0xFF1F2937);
+    const textSecondary = Color(0xFF6B7280);
+    const badgeSupervisor = Color(0xFF3B82C4);
+    const surfaceContainerLow = Color(0xFFEFF4FF);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFEAF2FB),
+      backgroundColor: canvasBackground,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 384),
+              constraints: const BoxConstraints(maxWidth: 384), // max-w-sm
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    children: [
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 240),
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: Image.network(
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuCn-q-_HtiKCQIM1KwRWvnfW5lL4xYU4-bIGELT1rrRdDI2TitXp1O7Yp-serUY3eHlUE1-XwqnXB8bpiDjTRGcXfCu1B3hrGEt0V-irjuKg_Z33KZJZIUX6DN1YHwaPrRxYQReFai-a4Dw29FzR_mqPTe7IwBYdh6QHrSlqXAdQTVS7Z1Y19KMcZl3nEUkzvsc9STx3OVCP5M1pd0tuuR_LmJV_XvQGnlk3yA_JE5Pv2sBI_hMkklLBhcrIwTADHyCIw',
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            Icons.precision_manufacturing_rounded,
-                            size: 64,
-                            color: Color(0xFF1E3A5F),
+                  // Hero / Logo Section
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0, bottom: 24.0),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          constraints: const BoxConstraints(maxWidth: 240),
+                          margin: const EdgeInsets.only(bottom: 12.0),
+                          child: Image.network(
+                            'https://lh3.googleusercontent.com/aida-public/AB6AXuCn-q-_HtiKCQIM1KwRWvnfW5lL4xYU4-bIGELT1rrRdDI2TitXp1O7Yp-serUY3eHlUE1-XwqnXB8bpiDjTRGcXfCu1B3hrGEt0V-irjuKg_Z33KZJZIUX6DN1YHwaPrRxYQReFai-a4Dw29FzR_mqPTe7IwBYdh6QHrSlqXAdQTVS7Z1Y19KMcZl3nEUkzvsc9STx3OVCP5M1pd0tuuR_LmJV_XvQGnlk3yA_JE5Pv2sBI_hMkklLBhcrIwTADHyCIw',
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => Text(
+                              'PLASTITRACK',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: primaryContainer,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      Text(
-                        'Inicia sesión',
-                        style: GoogleFonts.inter(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1F2937),
-                          letterSpacing: -0.24,
+                        Text(
+                          'Inicia sesión',
+                          style: GoogleFonts.inter(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: textPrimary,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          offset: Offset(0, 2),
-                        )
                       ],
                     ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Usuario:',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF1F2937),
-                                ),
+                  ),
+
+                  // Main Auth Card
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color.fromRGBO(0, 0, 0, 0.06),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Campo Usuario
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Usuario:',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: textPrimary,
                               ),
-                              Text(
-                                'ID de planta',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: const Color(0xFF6B7280),
-                                ),
+                            ),
+                            Text(
+                              'ID de planta',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: textSecondary,
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: borderSubtle),
                           ),
-                          const SizedBox(height: 4),
-                          TextFormField(
-                            controller: _userController,
-                            style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF1F2937)),
+                          child: TextField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            style: GoogleFonts.inter(fontSize: 14, color: textPrimary),
                             decoration: InputDecoration(
                               hintText: 'Ej. operador01@plastitrack.com',
                               hintStyle: GoogleFonts.inter(color: const Color(0xFF74777F)),
                               prefixIcon: const Icon(Icons.badge_outlined, color: Color(0xFF74777F), size: 20),
-                              filled: true,
-                              fillColor: const Color(0xFFEFF4FF),
-                              contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(color: Color(0xFFE2E5EA)),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(color: Color(0xFFE2E5EA)),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Campo Contraseña
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Contraseña:',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: textPrimary,
                               ),
                             ),
-                            validator: (val) => (val == null || val.isEmpty) ? 'Campo requerido' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Contraseña:',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF1F2937),
-                                ),
+                            Text(
+                              'PIN / Clave',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: textSecondary,
                               ),
-                              Text(
-                                'PIN / Clave',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: const Color(0xFF6B7280),
-                                ),
-                              ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: borderSubtle),
                           ),
-                          const SizedBox(height: 4),
-                          TextFormField(
+                          child: TextField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
-                            style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF1F2937)),
+                            style: GoogleFonts.inter(fontSize: 14, color: textPrimary),
                             decoration: InputDecoration(
                               hintText: '••••••••',
                               hintStyle: GoogleFonts.inter(color: const Color(0xFF74777F)),
@@ -193,106 +253,117 @@ class _LoginScreenState extends State<LoginScreen> {
                                   });
                                 },
                               ),
-                              filled: true,
-                              fillColor: const Color(0xFFEFF4FF),
-                              contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(color: Color(0xFFE2E5EA)),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(color: Color(0xFFE2E5EA)),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Botón Iniciar Sesión
+                        SizedBox(
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _handleAuthSubmit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryContainer,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            validator: (val) => (val == null || val.isEmpty) ? 'Campo requerido' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isSuccess
-                                    ? const Color(0xFF2E9E5B)
-                                    : const Color(0xFF1E3A5F),
-                                foregroundColor: Colors.white,
-                                elevation: 1,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _isLoading ? 'Verificando estación...' : 'Iniciar Sesión',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                              onPressed: _isLoading ? null : _handleAuthSubmit,
+                                const SizedBox(width: 8),
+                                _isLoading
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Recordar mi usuario
+                        Center(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _rememberUser = !_rememberUser;
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(4),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
-                                    _isSuccess
-                                        ? '¡Acceso Correcto!'
-                                        : _isLoading
-                                            ? 'Verificando estación...'
-                                            : 'Iniciar Sesión',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: Checkbox(
+                                      value: _rememberUser,
+                                      activeColor: primaryContainer,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _rememberUser = val ?? false;
+                                        });
+                                      },
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  if (_isLoading)
-                                    const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  else
-                                    Icon(
-                                      _isSuccess ? Icons.check_circle_outline : Icons.arrow_forward,
-                                      size: 20,
+                                  Text(
+                                    'Recordar mi usuario',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      color: textPrimary,
+                                      fontWeight: FontWeight.w400,
                                     ),
+                                  ),
                                 ],
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Checkbox(
-                                value: _rememberUser,
-                                activeColor: const Color(0xFF022448),
-                                onChanged: (val) {
-                                  setState(() {
-                                    _rememberUser = val ?? true;
-                                  });
-                                },
-                              ),
-                              Text(
-                                'Recordar mi usuario',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: const Color(0xFF1F2937),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Center(
-                            child: TextButton(
-                              onPressed: () {},
-                              child: Text(
-                                '¿Olvidaste tu contraseña?',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xFF3B82C4),
-                                ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // ¿Olvidaste tu contraseña?
+                        Center(
+                          child: TextButton(
+                            onPressed: _olvideContrasena,
+                            child: Text(
+                              '¿Olvidaste tu contraseña?',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: badgeSupervisor,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
